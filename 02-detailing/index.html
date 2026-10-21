@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Чёрный лак — Премиальный детейлинг-центр</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Unbounded:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #050505;
+    --text: #ffffff;
+    --muted: #999999;
+    --accent: #ff1e1e;
+    --blue-dark: #0044cc;
+    --blue-light: #00aaff;
+    --border: rgba(255, 255, 255, 0.1);
+    --ease: cubic-bezier(0.215, 0.61, 0.355, 1);
+    --container: 1600px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    background-image: 
+      radial-gradient(circle at 10% 0%, rgba(255, 30, 30, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 90% 100%, rgba(0, 68, 204, 0.1) 0%, transparent 40%);
+    background-attachment: fixed;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  img { display: block; max-width: 100%; object-fit: cover; }
+  button, input, select, textarea { font: inherit; color: inherit; background: none; border: none; }
+
+  /* ---------- CUSTOM CURSOR ---------- */
+  .cursor {
+    position: fixed;
+    top: 0; left: 0;
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s var(--ease), height 0.3s var(--ease), background 0.3s var(--ease), box-shadow 0.3s var(--ease);
+    box-shadow: 0 0 20px rgba(255, 30, 30, 0.8);
+  }
+  .cursor.hover {
+    width: 80px; height: 80px;
+    background: transparent;
+    border: 1px solid var(--blue-light);
+    box-shadow: 0 0 40px rgba(0, 170, 255, 0.4);
+  }
+  @media (pointer: fine) {
+    body, a, button, .card, .city-card, .review-card, .nav-btn { cursor: none; }
+    .cursor { display: block; }
+  }
+  @media (pointer: coarse) { .cursor { display: none !important; } }
+
+  /* ---------- LAYOUT ---------- */
+  .container {
+    width: 100%;
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 0 5%;
+  }
+  .section-pad { padding: 140px 0; }
+
+  /* ---------- HEADER ---------- */
+  header {
+    position: fixed;
+    top: 0; left: 0; width: 100%;
+    z-index: 1000;
+    padding: 24px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.5s var(--ease);
+    border-bottom: 1px solid transparent;
+  }
+  header.scrolled {
+    background: rgba(5, 5, 5, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 16px 5%;
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+  }
+  header.scrolled .logo { text-shadow: none; }
+  .logo span { color: var(--accent); }
+  
+  nav {
+    display: flex;
+    gap: 40px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 500;
+  }
+  
+  nav a { 
+    color: rgba(255, 255, 255, 0.9); 
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+    transition: color 0.3s var(--ease); 
+  }
+  header.scrolled nav a {
+    color: #fff;
+    text-shadow: none;
+  }
+  nav a:hover { 
+    color: var(--blue-light); 
+    text-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
+  }
+
+  .btn-header {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 12px;
+    padding: 14px 28px;
+    border: 1px solid var(--accent);
+    border-radius: 100px;
+    color: var(--accent);
+    background: rgba(5, 5, 5, 0.4);
+    backdrop-filter: blur(4px);
+    transition: all 0.3s var(--ease);
+    text-transform: uppercase;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  header.scrolled .btn-header {
+    background: transparent;
+  }
+  .btn-header:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    box-shadow: 0 0 30px rgba(255, 30, 30, 0.5);
+  }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    height: 100vh;
+    min-height: 700px;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 100px;
+    overflow: hidden;
+    background: #111;
+  }
+  
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+    animation: zoomSlow 20s infinite alternate;
+  }
+  
+  @keyframes zoomSlow {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.1); }
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: 
+      linear-gradient(to right, rgba(5,5,5,0.95) 0%, rgba(5,5,5,0.7) 45%, rgba(5,5,5,0.3) 100%),
+      linear-gradient(to top, rgba(5,5,5,1) 0%, transparent 40%);
+    z-index: 2;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 3;
+    width: 60%;
+    max-width: 900px;
+    will-change: transform;
+  }
+
+  .hero-label {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--blue-light);
+    margin-bottom: 24px;
+    display: inline-block;
+    padding: 10px 20px;
+    border: 1px solid rgba(0, 170, 255, 0.3);
+    border-radius: 100px;
+    background: rgba(0, 170, 255, 0.1);
+    backdrop-filter: blur(10px);
+  }
+
+  .hero h1 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(44px, 6.5vw, 110px);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 48px;
+    text-shadow: 0 10px 50px rgba(0,0,0,0.9);
+  }
+  
+  .hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+    text-shadow: 0 0 40px rgba(255, 30, 30, 0.4);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 22px 56px;
+    border-radius: 100px;
+    transition: all 0.3s var(--ease);
+    box-shadow: 0 0 30px rgba(255, 30, 30, 0.3);
+    cursor: pointer;
+  }
+  .btn:hover {
+    transform: translateY(-4px) scale(1.02);
+    background: var(--blue-dark);
+    box-shadow: 0 15px 40px rgba(0, 68, 204, 0.6);
+  }
+
+  /* ---------- SERVICES ---------- */
+  .services-header {
+    margin-bottom: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .section-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(32px, 4vw, 56px);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .services-header p {
+    color: var(--muted);
+    max-width: 340px;
+    text-align: right;
+    font-size: 15px;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  
+  .card {
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #0a0a0a 0%, #050505 100%);
+    border: 1px solid var(--border);
+    transition: border-color 0.3s var(--ease), transform 0.1s ease-out;
+    transform-style: preserve-3d;
+    aspect-ratio: 16 / 10;
+  }
+  .card:hover { border-color: var(--blue-light); }
+  
+  .card-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s var(--ease);
+    transform: translateZ(0);
+    z-index: 1;
+  }
+  .card:hover .card-img {
+    transform: scale(1.08);
+  }
+
+  .card-content {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(5,5,5,1) 0%, rgba(5,5,5,0.4) 60%, transparent 100%);
+    padding: 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    transition: background 0.3s var(--ease);
+    transform: translateZ(40px);
+    z-index: 2;
+  }
+  
+  .card:hover .card-content {
+    background: linear-gradient(to top, rgba(0, 68, 204, 0.95) 0%, rgba(5,5,5,0.3) 70%, transparent 100%);
+  }
+  
+  .card-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 16px;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .card:hover .card-num { color: #fff; }
+  
+  .card h3 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .card p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.6;
+    max-width: 90%;
+  }
+  .card:hover p { color: #fff; }
+
+  /* ---------- GALLERY ---------- */
+  .gallery-section {
+    padding: 140px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: #080808;
+  }
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .gallery-text h2 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(40px, 5vw, 72px);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 32px;
+  }
+  .gallery-text h2 span { color: var(--blue-light); }
+  
+  .gallery-text p {
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    font-weight: 300;
+    max-width: 95%;
+  }
+  .gallery-text p strong {
+    color: var(--blue-light);
+    font-weight: 500;
+  }
+
+  .gallery-img-wrapper {
+    border-radius: 24px;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    border: 1px solid var(--border);
+  }
+  .gallery-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s var(--ease);
+  }
+  .gallery-img-wrapper:hover img {
+    transform: scale(1.05);
+  }
+
+  /* ---------- LOCATIONS ---------- */
+  .locations-section {
+    padding: 140px 0;
+    background: #050505;
+    border-bottom: 1px solid var(--border);
+  }
+  .locations-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .city-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    padding: 40px;
+    border-radius: 20px;
+    transition: border-color 0.3s var(--ease), background 0.3s var(--ease);
+  }
+  .city-card:hover {
+    border-color: var(--blue-light);
+    background: rgba(0, 170, 255, 0.03);
+  }
+  .city-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: var(--accent);
+  }
+  .city-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .city-list li {
+    font-size: 15px;
+    color: var(--text);
+    display: flex;
+    gap: 12px;
+  }
+  .city-list li::before {
+    content: '';
+    display: block;
+    width: 6px; height: 6px;
+    background: var(--blue-light);
+    border-radius: 50%;
+    margin-top: 8px;
+    flex-shrink: 0;
+    box-shadow: 0 0 10px var(--blue-light);
+  }
+  .city-list span {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* ---------- MAP SECTION ---------- */
+  .map-section {
+    padding: 140px 0;
+    background: #080808;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .map-wrapper {
+    width: 100%;
+    height: 550px;
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+    background: #111;
+  }
+  .map-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    filter: grayscale(0.2) contrast(1.1);
+  }
+
+  /* ---------- PROCESS ---------- */
+  .process-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .process-img {
+    border-radius: 24px;
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+    position: relative;
+    border: 1px solid var(--border);
+    background: linear-gradient(135deg, #0a0a0a 0%, #050505 100%);
+  }
+  .process-img img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s var(--ease);
+  }
+  .process-img:hover img { transform: scale(1.05); }
+  
+  .process-text h2 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(32px, 4vw, 48px);
+    font-weight: 700;
+    margin-bottom: 32px;
+  }
+  
+  .process-text p {
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.7;
+    margin-bottom: 24px;
+    font-weight: 300;
+  }
+  .process-text strong { 
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* ---------- REVIEWS (СЛАЙДЕР) ---------- */
+  .reviews-section {
+    padding: 140px 0;
+    background: #080808;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .reviews-header-wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 60px;
+  }
+  
+  .reviews-nav {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .nav-btn {
+    width: 56px; height: 56px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    transition: all 0.3s var(--ease);
+    cursor: pointer;
+  }
+  .nav-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(255, 30, 30, 0.05);
+    box-shadow: 0 0 20px rgba(255, 30, 30, 0.2);
+  }
+  .nav-btn svg {
+    width: 20px; height: 20px;
+  }
+
+  .reviews-slider {
+    display: flex;
+    gap: 24px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 20px;
+    scrollbar-width: none; 
+    -ms-overflow-style: none;
+  }
+  .reviews-slider::-webkit-scrollbar { 
+    display: none; 
+  }
+  
+  .review-card {
+    flex: 0 0 calc(33.333% - 16px);
+    scroll-snap-align: start;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    padding: 40px;
+    border-radius: 20px;
+    transition: border-color 0.3s var(--ease), background 0.3s var(--ease);
+    display: flex;
+    flex-direction: column;
+  }
+  .review-card:hover {
+    border-color: var(--blue-light);
+    background: rgba(0, 170, 255, 0.03);
+  }
+  
+  .review-stars {
+    color: var(--accent);
+    font-size: 20px;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+  }
+  .review-text {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.8;
+    margin-bottom: 32px;
+    flex-grow: 1;
+  }
+  .review-author {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+  }
+  .author-name {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .author-car {
+    font-size: 13px;
+    color: var(--blue-light);
+  }
+
+  /* ---------- FORM ---------- */
+  .form-section {
+    border-top: 1px solid var(--border);
+    background: linear-gradient(to bottom, var(--bg), #050810); 
+  }
+  .form-wrapper {
+    max-width: 700px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 64px;
+    border-radius: 32px;
+    border: 1px solid var(--border);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+  }
+  .form-wrapper h2 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .form-wrapper > p {
+    text-align: center;
+    color: var(--muted);
+    margin-bottom: 48px;
+  }
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+  .input-group input,
+  .input-group select,
+  .input-group textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 24px;
+    font-size: 16px;
+    color: var(--text);
+    outline: none;
+    transition: all 0.3s var(--ease);
+    font-family: inherit;
+    /* ИСПРАВЛЕНИЕ ОШИБКИ В 671 СТРОКЕ */
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .input-group select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 24px center;
+    background-size: 16px;
+  }
+  .input-group select option { background: #111; color: #fff; }
+  .input-group textarea { resize: vertical; min-height: 120px; }
+  .input-group input::placeholder, .input-group textarea::placeholder { color: var(--muted); }
+  
+  .input-group input:focus,
+  .input-group select:focus,
+  .input-group textarea:focus {
+    border-color: var(--blue-light);
+    background: rgba(0, 170, 255, 0.05);
+    box-shadow: 0 0 30px rgba(0, 170, 255, 0.15);
+  }
+  
+  .form-wrapper .btn { width: 100%; }
+  .form-wrapper .btn:hover { background: var(--blue-dark); }
+
+  /* ---------- FOOTER ---------- */
+  footer {
+    padding: 80px 0 40px;
+    border-top: 1px solid var(--border);
+    background: #020202;
+  }
+  .footer-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 60px;
+  }
+  .footer-col h4 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 24px;
+  }
+  .footer-logo {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 32px;
+    font-weight: 900;
+    margin-bottom: 20px;
+  }
+  .footer-logo span { color: var(--accent); }
+  .footer-desc {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+    max-width: 300px;
+  }
+  .footer-links, .footer-contacts, .footer-socials {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .footer-links a, .footer-contacts a, .footer-socials a {
+    color: var(--muted);
+    font-size: 15px;
+    transition: color 0.3s var(--ease);
+  }
+  .footer-links a:hover, .footer-contacts a:hover, .footer-socials a:hover {
+    color: var(--blue-light);
+  }
+  .footer-contacts p {
+    color: var(--muted);
+    font-size: 14px;
+    margin-top: 8px;
+  }
+  .footer-bottom {
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* ---------- REVEAL ---------- */
+  .reveal {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 1024px) {
+    .services-grid { grid-template-columns: 1fr; }
+    .gallery-grid { grid-template-columns: 1fr; gap: 40px; }
+    .process-grid { grid-template-columns: 1fr; gap: 48px; }
+    .locations-grid { grid-template-columns: repeat(2, 1fr); }
+    
+    .review-card { flex: 0 0 calc(50% - 12px); }
+    .reviews-header-wrap { flex-direction: column; align-items: flex-start; gap: 24px; }
+    
+    .footer-top { grid-template-columns: 1fr 1fr; gap: 40px; }
+    .hero-content { width: 80%; }
+    .process-img { aspect-ratio: 16 / 9; }
+    .map-wrapper { height: 400px; }
+  }
+
+  @media (max-width: 768px) {
+    .hero-content { width: 100%; }
+    .hero h1 { font-size: clamp(36px, 10vw, 64px); }
+    .services-header { flex-direction: column; align-items: flex-start; gap: 24px; }
+    .services-header p { text-align: left; }
+    nav { display: none; }
+    .form-wrapper { padding: 40px 24px; }
+    .locations-grid { grid-template-columns: 1fr; }
+    
+    .review-card { flex: 0 0 100%; }
+    
+    .footer-top { grid-template-columns: 1fr; gap: 32px; }
+    .footer-bottom { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .card-content { padding: 32px 24px; }
+    .map-wrapper { height: 350px; }
+    .reviews-nav { width: 100%; justify-content: flex-end; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor"></div>
+
+<!-- HEADER -->
+<header id="header">
+  <a href="#" class="logo">Чёрный <span>лак</span></a>
+  <nav>
+    <a href="#services">Услуги</a>
+    <a href="#locations">Центры</a>
+    <a href="#process">О нас</a>
+    <a href="#contacts">Контакты</a>
+  </nav>
+  <a href="#contacts" class="btn-header">Связаться</a>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <img class="hero-bg" src="hero.jpg" alt="Две черные машины в детейлинг-боксе">
+    <div class="hero-overlay"></div>
+    
+    <div class="container">
+      <div class="hero-content" id="parallax-hero">
+        <span class="hero-label">Премиальный детейлинг</span>
+        <h1>Ваш автомобиль<br><em>заслуживает большего</em></h1>
+        <a href="#contacts" class="btn">Рассчитать стоимость</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="section-pad container" id="services">
+    <div class="services-header reveal">
+      <h2 class="section-title">Что мы делаем</h2>
+      <p>Работаем с ограниченным количеством машин в день. Без конвейера и спешки.</p>
+    </div>
+    
+    <div class="services-grid">
+      <div class="card reveal">
+        <img class="card-img" src="ceramic.jpg" alt="Нанесение керамики">
+        <div class="card-content">
+          <span class="card-num">01</span>
+          <h3>Керамика</h3>
+          <p>Наносим 3 слоя керамического покрытия. Защищает кузов от реагентов и придаёт глубокий глянцевый блеск.</p>
+        </div>
+      </div>
+      
+      <div class="card reveal" style="transition-delay: 0.1s;">
+        <img class="card-img" src="wrap.jpg" alt="Оклейка пленкой">
+        <div class="card-content">
+          <span class="card-num">02</span>
+          <h3>Оклейка</h3>
+          <p>Матовые и глянцевые плёнки. Защита от сколов или полная смена цвета с сохранением заводского ЛКП.</p>
+        </div>
+      </div>
+      
+      <div class="card reveal" style="transition-delay: 0.2s;">
+        <img class="card-img" src="interior.jpg" alt="Химчистка салона">
+        <div class="card-content">
+          <span class="card-num">03</span>
+          <h3>Химчистка</h3>
+          <p>Глубокая очистка салона. Работаем с кожей, алькантарой и деревом. Убираем запахи на молекулярном уровне.</p>
+        </div>
+      </div>
+      
+      <div class="card reveal" style="transition-delay: 0.3s;">
+        <img class="card-img" src="polish.jpg" alt="Полировка кузова">
+        <div class="card-content">
+          <span class="card-num">04</span>
+          <h3>Полировка</h3>
+          <p>Убираем царапины и голограммы абразивными пастами. Возвращаем кузову идеальную геометрию.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section class="gallery-section" id="gallery">
+    <div class="container">
+      <div class="gallery-grid">
+        <div class="gallery-text reveal">
+          <h2>Идеальный блеск.<br><span>Без компромиссов.</span></h2>
+          <p>Мы не просто моем машины. Мы возвращаем им <strong>заводской лоск</strong>, который виден в каждой детали. <strong>Глянец, который ощущается на ощупь.</strong> Работаем только с премиальным сегментом, где важна каждая линия.</p>
+        </div>
+        <div class="gallery-img-wrapper reveal" style="transition-delay: 0.1s;">
+          <img src="gallery.jpg" alt="Зеленая машина в боксе">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOCATIONS -->
+  <section class="locations-section" id="locations">
+    <div class="container">
+      <div class="services-header reveal" style="margin-bottom: 40px;">
+        <h2 class="section-title">Наши центры</h2>
+        <p>Работаем в нескольких городах России. Найдите ближайший к вам детейлинг-центр.</p>
+      </div>
+      
+      <div class="locations-grid">
+        <div class="city-card reveal">
+          <div class="city-title">Москва</div>
+          <ul class="city-list">
+            <li>ул. Тверская, 12 <span>Ежедневно 09:00 - 21:00</span></li>
+            <li>Ленинградский пр-т, 45 <span>Ежедневно 10:00 - 22:00</span></li>
+            <li>Кутузовский пр-т, 88 <span>Ежедневно 09:00 - 20:00</span></li>
+          </ul>
+        </div>
+
+        <div class="city-card reveal" style="transition-delay: 0.1s;">
+          <div class="city-title">Казань</div>
+          <ul class="city-list">
+            <li>ул. Баумана, 15 <span>Ежедневно 09:00 - 20:00</span></li>
+          </ul>
+        </div>
+
+        <div class="city-card reveal" style="transition-delay: 0.2s;">
+          <div class="city-title">Нижний Новгород</div>
+          <ul class="city-list">
+            <li>ул. Рождественская, 22 <span>Ежедневно 10:00 - 20:00</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAP SECTION -->
+  <section class="map-section" id="map-section">
+    <div class="container">
+      <div class="services-header reveal" style="margin-bottom: 40px;">
+        <h2 class="section-title">Мы на карте</h2>
+        <p>Интерактивная карта всех наших филиалов.</p>
+      </div>
+      
+      <div class="map-wrapper reveal" style="transition-delay: 0.1s;">
+        <!-- ТВОЙ КОД ЯНДЕКС КАРТЫ -->
+        <iframe src="https://yandex.ru/map-widget/v1/?um=constructor%3Aadb887d3066d9306252cfe004e796c0b60094ade793e819974b8b171f19acf1a&amp;source=constructor" width="100%" height="100%" frameborder="0"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="section-pad container" id="process">
+    <div class="process-grid">
+      <div class="process-img reveal">
+        <img src="process.jpg" alt="Процесс работы">
+      </div>
+      <div class="process-text reveal" style="transition-delay: 0.1s;">
+        <h2>Ремесленный подход</h2>
+        <p>В «Чёрном лаке» <strong>мы не работаем на поток</strong>. Мы берём максимум три автомобиля в день, чтобы каждый мастер мог посвятить вашей машине столько времени, сколько требуется для идеала.</p>
+        <p>Наша цель — не просто отполировать кузов, а <strong>сохранить первозданный вид на годы вперёд</strong>. Мы используем только премиальные составы и проверяем результат под специальным светом.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEWS (ОБНОВЛЕННЫЙ СЛАЙДЕР) -->
+  <section class="reviews-section" id="reviews">
+    <div class="container">
+      
+      <div class="reviews-header-wrap reveal">
+        <div>
+          <h2 class="section-title">Отзывы клиентов</h2>
+          <p style="color: var(--muted); margin-top: 12px;">Мнение тех, кто уже доверил нам свой автомобиль.</p>
+        </div>
+        
+        <!-- Кнопки навигации -->
+        <div class="reviews-nav">
+          <button id="btn-prev" class="nav-btn" aria-label="Предыдущий отзыв">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          </button>
+          <button id="btn-next" class="nav-btn" aria-label="Следующий отзыв">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Лента отзывов -->
+      <div class="reviews-slider reveal" id="reviews-slider" style="transition-delay: 0.1s;">
+        
+        <!-- 1 -->
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">"Делал керамику на Porsche Panamera. Результат превзошел ожидания — кузов как зеркало. Отдельное спасибо за то, что не взяли машину в день обращения, а записали на следующий день, чтобы уделить достаточно времени."</p>
+          <div class="review-author">
+            <span class="author-name">Александр</span>
+            <span class="author-car">Porsche Panamera</span>
+          </div>
+        </div>
+
+        <!-- 2 -->
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">"Заказывала химчистку салона и полировку на BMW X5. Салон как новый, запах полностью ушел. Мастера работают аккуратно, все объясняют. Видно, что ребята любят свое дело."</p>
+          <div class="review-author">
+            <span class="author-name">Елена</span>
+            <span class="author-car">BMW X5</span>
+          </div>
+        </div>
+
+        <!-- 3 -->
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">"Оклеивали GLE в матовый черный. Пленка легла идеально, ни одного пузыря. Понравился подход: все делается в чистом боксе, с правильным светом. Рекомендую!"</p>
+          <div class="review-author">
+            <span class="author-name">Дмитрий</span>
+            <span class="author-car">Mercedes GLE</span>
+          </div>
+        </div>
+
+        <!-- 4 -->
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">"Брал комплекс: керамика + полировка на Audi RS6. Машина выглядит лучше, чем из салона. Отдельный респект за то, что нашли подход к сложному цвету и убрали все микроцарапины."</p>
+          <div class="review-author">
+            <span class="author-name">Михаил</span>
+            <span class="author-car">Audi RS6</span>
+          </div>
+        </div>
+
+        <!-- 5 -->
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">"После зимы салон Range Rover был в плачевном состоянии (дети, собака). Сделали глубокую химчистку. Теперь кожа как новая, даже запах нового авто появился. Очень доволен."</p>
+          <div class="review-author">
+            <span class="author-name">Владимир</span>
+            <span class="author-car">Range Rover</span>
+          </div>
+        </div>
+
+        <!-- 6 -->
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">"Оклеил Tesla Model 3 в прозрачную пленку (PPF) полностью. Сделали аккуратно, все стыки незаметны. Плюс затонировали заднюю полусферу. Цены адекватные для такого уровня."</p>
+          <div class="review-author">
+            <span class="author-name">Игорь</span>
+            <span class="author-car">Tesla Model 3</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FORM -->
+  <section class="section-pad form-section" id="contacts">
+    <div class="container">
+      <div class="form-wrapper reveal">
+        <h2>Рассчитать стоимость</h2>
+        <p>Оставьте заявку, и мы свяжемся с вами для уточнения деталей.</p>
+        
+        <form id="bookingForm">
+          <div class="form-row">
+            <div class="input-group">
+              <input type="text" id="name" name="name" placeholder="Ваше имя" required>
+            </div>
+            <div class="input-group">
+              <input type="tel" id="phone" name="phone" placeholder="Номер телефона" required>
+            </div>
+            <div class="input-group">
+              <select id="service" name="service" required>
+                <option value="" disabled selected>Выберите услугу</option>
+                <option value="Керамика">Керамика</option>
+                <option value="Оклейка">Оклейка</option>
+                <option value="Химчистка">Химчистка</option>
+                <option value="Полировка">Полировка</option>
+                <option value="Комплекс">Комплекс (всё сразу)</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <textarea id="wishes" name="wishes" placeholder="Ваши пожелания (например, какая машина, что именно хотите сделать)"></textarea>
+            </div>
+          </div>
+          <button type="submit" class="btn" id="submitBtn">Отправить заявку</button>
+        </form>
+        <div id="formSuccess" style="display: none; text-align: center; padding: 20px; border: 1px solid var(--blue-light); border-radius: 12px; margin-top: 20px; color: var(--text);">
+          Спасибо. Мы свяжемся с вами в течение дня.
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-col">
+        <div class="footer-logo">Чёрный <span>лак</span></div>
+        <p class="footer-desc">Премиальный детейлинг-центр. Возвращаем автомобилям заводской лоск и защищаем кузов на годы вперёд.</p>
+      </div>
+      
+      <div class="footer-col">
+        <h4>Навигация</h4>
+        <div class="footer-links">
+          <a href="#services">Услуги</a>
+          <a href="#locations">Центры</a>
+          <a href="#process">О нас</a>
+          <a href="#reviews">Отзывы</a>
+        </div>
+      </div>
+      
+      <div class="footer-col">
+        <h4>Контакты</h4>
+        <div class="footer-contacts">
+          <a href="tel:+79991234567">+7 (999) 123-45-67</a>
+          <a href="mailto:hello@chernyilak.ru">hello@chernyilak.ru</a>
+          <p>Ежедневно с 09:00 до 22:00</p>
+        </div>
+      </div>
+      
+      <div class="footer-col">
+        <h4>Мы в сети</h4>
+        <div class="footer-socials">
+          <a href="#">Telegram</a>
+          <a href="#">Instagram</a>
+          <a href="#">VK</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <div>© 2026 Чёрный лак / Премиальный детейлинг</div>
+      <div>Сделано с умом</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* --- CUSTOM CURSOR --- */
+  (function () {
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+    const cursor = document.querySelector('.cursor');
+    let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+    let cx = mx, cy = my;
+
+    document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
+
+    function loop() {
+      cx += (mx - cx) * 0.12;
+      cy += (my - cy) * 0.12;
+      cursor.style.transform = `translate(${cx}px, ${cy}px) translate(-50%, -50%)`;
+      requestAnimationFrame(loop);
+    }
+    loop();
+
+    const hoverables = 'a, button, .card, .review-card, input, select, textarea, .city-card, .nav-btn';
+    document.querySelectorAll(hoverables).forEach((el) => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+    });
+  })();
+
+  /* --- HEADER SCROLL --- */
+  (function () {
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) header.classList.add('scrolled');
+      else header.classList.remove('scrolled');
+    }, { passive: true });
+  })();
+
+  /* --- HERO PARALLAX --- */
+  (function () {
+    const hero = document.querySelector('.hero');
+    const content = document.getElementById('parallax-hero');
+    if (!hero || !content) return;
+
+    hero.addEventListener('mousemove', (e) => {
+      const { width, height, left, top } = hero.getBoundingClientRect();
+      const x = e.clientX - left - width / 2;
+      const y = e.clientY - top - height / 2;
+      
+      const moveX = -(x / width) * 30;
+      const moveY = -(y / height) * 30;
+      
+      content.style.transform = `translate(${moveX}px, ${moveY}px)`;
+      content.style.transition = 'transform 0.1s ease-out';
+    });
+
+    hero.addEventListener('mouseleave', () => {
+      content.style.transform = `translate(0px, 0px)`;
+      content.style.transition = 'transform 0.8s cubic-bezier(0.215, 0.61, 0.355, 1)';
+    });
+  })();
+
+  /* --- 3D TILT EFFECT ON CARDS --- */
+  (function () {
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const rotateX = ((y - centerY) / centerY) * -6;
+        const rotateY = ((x - centerX) / centerX) * 6;
+        
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+      });
+      
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale(1)`;
+      });
+    });
+  })();
+
+  /* --- REVEAL ANIMATION --- */
+  (function () {
+    const els = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window)) {
+      els.forEach((el) => el.classList.add('visible'));
+      return;
+    }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    els.forEach((el) => io.observe(el));
+  })();
+
+  /* --- СЛАЙДЕР ОТЗЫВОВ (СТРЕЛОЧКИ) --- */
+  (function () {
+    const slider = document.getElementById('reviews-slider');
+    const prevBtn = document.getElementById('btn-prev');
+    const nextBtn = document.getElementById('btn-next');
+    if (!slider || !prevBtn || !nextBtn) return;
+
+    function getScrollAmount() {
+      const card = slider.querySelector('.review-card');
+      if (!card) return 300;
+      return card.offsetWidth + 24;
+    }
+
+    nextBtn.addEventListener('click', () => {
+      slider.scrollBy({ left: getScrollAmount(), behavior: 'smooth' });
+    });
+
+    prevBtn.addEventListener('click', () => {
+      slider.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' });
+    });
+  })();
+
+  /* --- ОТПРАВКА ФОРМЫ (WEB3FORMS) --- */
+  const WEB3FORMS_ACCESS_KEY = 'e1707b8e-060c-4394-ab27-90778190d0c3';
+
+  (function () {
+    const form = document.getElementById('bookingForm');
+    const success = document.getElementById('formSuccess');
+    const submitBtn = document.getElementById('submitBtn');
+    if (!form) return;
+
+    let isSubmitting = false;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (isSubmitting) return; 
+
+      isSubmitting = true;
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Отправляем...';
+      submitBtn.disabled = true;
+
+      const formData = new FormData(form);
+      formData.append('access_key', WEB3FORMS_ACCESS_KEY);
+      formData.append('subject', 'Новая заявка на детейлинг — Чёрный лак');
+      formData.append('_captcha', 'false');
+      
+      try {
+        const response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+          form.style.display = 'none';
+          success.style.display = 'block';
+        } else {
+          console.error('Web3Forms Error:', data);
+          alert('Сервер перегружен. Пожалуйста, попробуйте позже или позвоните нам.');
+        }
+      } catch (error) {
+        console.error('Network Error:', error);
+        alert('Ошибка соединения. Проверьте интернет.');
+      } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+        setTimeout(() => { isSubmitting = false; }, 3000);
+      }
+    });
+  })();
+</script>
+</body>
+</html>

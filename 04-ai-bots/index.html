@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-SYSTEMS — Разработка AI-ботов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --text: #ffffff;
+    --muted: #888888;
+    --accent: #00ff66;
+    --card-bg: #111111;
+    --border: rgba(255, 255, 255, 0.1);
+    --ease: cubic-bezier(0.215, 0.61, 0.355, 1);
+    --container: 1600px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    background-image: 
+      radial-gradient(circle at 10% 0%, rgba(0, 255, 102, 0.05) 0%, transparent 40%),
+      radial-gradient(circle at 90% 100%, rgba(0, 255, 102, 0.03) 0%, transparent 40%);
+    background-attachment: fixed;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+
+  .progress-bar {
+    position: fixed; top: 0; left: 0;
+    height: 3px; background: var(--accent); width: 0%;
+    z-index: 10000;
+    box-shadow: 0 0 10px var(--accent);
+    transition: width 0.1s linear;
+  }
+
+  .cursor {
+    position: fixed; top: 0; left: 0;
+    width: 10px; height: 10px;
+    background: var(--accent); border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s var(--ease), height 0.3s var(--ease), background 0.3s var(--ease);
+    box-shadow: 0 0 20px rgba(0, 255, 102, 0.5);
+  }
+  .cursor.hover {
+    width: 60px; height: 60px;
+    background: transparent; border: 1px solid var(--accent);
+  }
+  @media (pointer: fine) {
+    body, a, button, .card, .input-group input, .price-card, .location-card, #sandCanvas { cursor: none; }
+    .cursor { display: block; }
+  }
+  @media (pointer: coarse) { .cursor { display: none !important; } }
+
+  header {
+    position: fixed; top: 0; left: 0; width: 100%;
+    z-index: 1000; padding: 24px 5%;
+    display: flex; justify-content: space-between; align-items: center;
+    transition: background-color 0.5s var(--ease), border-color 0.5s var(--ease);
+    border-bottom: 1px solid transparent;
+  }
+  header.scrolled {
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 5%;
+  }
+  .logo {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: 24px; letter-spacing: -0.02em; text-transform: uppercase;
+  }
+  .logo span { color: var(--accent); }
+  
+  nav { display: flex; gap: 40px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; }
+  nav a { color: var(--muted); transition: color 0.3s var(--ease); }
+  nav a:hover { color: var(--accent); }
+
+  .header-right { display: flex; align-items: center; gap: 24px; }
+
+  .cart-btn {
+    position: relative;
+    font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600;
+    color: var(--text); display: flex; align-items: center; gap: 8px;
+    transition: color 0.3s var(--ease);
+  }
+  .cart-btn:hover { color: var(--accent); }
+  .cart-count { background: var(--accent); color: #000; padding: 2px 8px; border-radius: 50%; font-size: 12px; }
+
+  .btn-header {
+    background: var(--accent); color: #000;
+    padding: 14px 28px; border-radius: 100px;
+    font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    transition: all 0.3s var(--ease);
+    box-shadow: 0 0 20px rgba(0, 255, 102, 0.3);
+    display: inline-block;
+  }
+  .btn-header:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(0, 255, 102, 0.6); }
+
+  .hero {
+    min-height: 100vh;
+    display: grid; grid-template-columns: minmax(320px, 39%) 1fr;
+    align-items: center; padding: 0 5%; padding-top: 80px;
+    position: relative; border-bottom: 1px solid var(--border); overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute;
+    top: 20%; right: 10%;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0, 255, 102, 0.1) 0%, transparent 60%);
+    z-index: 0; pointer-events: none;
+    transition: transform 0.1s ease-out;
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 100%; padding-right: 20px; }
+  .hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(48px, 6vw, 96px); font-weight: 600;
+    line-height: 1.05; letter-spacing: -0.03em; margin-bottom: 32px;
+    text-transform: uppercase;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .hero h1 span { display: block; animation: slideUp 0.8s cubic-bezier(0.215, 0.61, 0.355, 1) both; }
+  .hero h1 span:nth-child(2) { animation-delay: 0.15s; color: var(--muted); }
+  @keyframes slideUp { 0% { transform: translateY(100%); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+
+  .hero p { font-size: 16px; color: var(--muted); max-width: 380px; margin-bottom: 48px; }
+
+  .btn-primary {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--accent); color: #000;
+    font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 600;
+    padding: 20px 40px; border-radius: 100px;
+    transition: all 0.3s var(--ease);
+    box-shadow: 0 10px 30px rgba(0, 255, 102, 0.2);
+    will-change: transform;
+  }
+  .btn-primary:hover { box-shadow: 0 15px 40px rgba(0, 255, 102, 0.5); }
+
+  /* --- Hero right column --- */
+  .hero-right {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 40px; height: 100%; padding-left: 4%;
+  }
+  .hero-numbers {
+    display: flex; flex-direction: column; justify-content: center;
+    gap: 60px; flex-shrink: 1; min-width: 0;
+  }
+  .hero-number-block { display: flex; flex-direction: column; }
+  .hero-number {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(80px, 8vw, 140px); font-weight: 500;
+    line-height: 0.9; color: var(--accent); letter-spacing: -0.04em;
+    text-shadow: 0 0 40px rgba(0, 255, 102, 0.2);
+  }
+  .hero-label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em;
+    color: var(--muted); margin-top: 12px; font-weight: 500;
+  }
+
+  /* --- Chat preview --- */
+  .hero-chat {
+    flex-shrink: 0; width: 320px; max-width: 100%;
+    background: linear-gradient(180deg, rgba(17,17,17,0.95) 0%, rgba(10,10,10,0.98) 100%);
+    border: 1px solid var(--border); border-radius: 20px; overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 60px rgba(0,255,102,0.06);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  }
+  .chat-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px; border-bottom: 1px solid var(--border);
+    background: rgba(0,255,102,0.04);
+  }
+  .chat-avatar {
+    position: relative; width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent) 0%, #00cc52 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    color: #000; font-size: 13px; flex-shrink: 0;
+    box-shadow: 0 0 20px rgba(0,255,102,0.4);
+  }
+  .chat-avatar::after {
+    content: ''; position: absolute; bottom: -1px; right: -1px;
+    width: 10px; height: 10px; border-radius: 50%; background: var(--accent);
+    border: 2px solid #111; box-shadow: 0 0 8px var(--accent);
+    animation: avatarPulse 2s ease-in-out infinite;
+  }
+  @keyframes avatarPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.25)} }
+
+  .chat-name { font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 14px; color: #fff; }
+  .chat-status {
+    font-size: 11px; color: var(--accent); margin-top: 2px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .chat-status::before {
+    content: ''; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 6px var(--accent);
+  }
+
+  .chat-messages {
+    display: flex; flex-direction: column; justify-content: flex-end;
+    gap: 8px; padding: 16px; height: 260px; overflow: hidden;
+  }
+  .chat-msg {
+    padding: 9px 12px; border-radius: 12px; font-size: 12px; line-height: 1.4;
+    max-width: 85%; animation: msgIn 0.4s var(--ease) both;
+    word-wrap: break-word;
+  }
+  .chat-msg.bot {
+    background: rgba(0,255,102,0.1); color: #fff;
+    border: 1px solid rgba(0,255,102,0.2);
+    border-bottom-left-radius: 4px; align-self: flex-start;
+  }
+  .chat-msg.user {
+    background: rgba(255,255,255,0.06); color: #ddd;
+    border: 1px solid var(--border);
+    border-bottom-right-radius: 4px; align-self: flex-end;
+  }
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(8px) scale(0.95); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .typing-bubble {
+    display: flex; gap: 4px; align-items: center;
+    padding: 11px 14px; background: rgba(0,255,102,0.1);
+    border: 1px solid rgba(0,255,102,0.2); border-radius: 12px;
+    border-bottom-left-radius: 4px; align-self: flex-start;
+    max-width: 85%; animation: msgIn 0.3s var(--ease) both;
+  }
+  .typing-bubble span {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+    opacity: 0.4; animation: typingBounce 1.2s infinite;
+  }
+  .typing-bubble span:nth-child(2) { animation-delay: 0.15s; }
+  .typing-bubble span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes typingBounce {
+    0%,60%,100% { opacity: 0.4; transform: translateY(0); }
+    30% { opacity: 1; transform: translateY(-3px); }
+  }
+
+  .chat-footer {
+    padding: 12px 16px; border-top: 1px solid var(--border);
+    background: rgba(0,0,0,0.3);
+  }
+  .chat-input-fake {
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+    border-radius: 100px; padding: 8px 14px;
+    font-size: 12px; color: var(--muted);
+  }
+
+  .marquee-section {
+    padding: 30px 0; border-bottom: 1px solid var(--border);
+    overflow: hidden; background: #050505; display: flex;
+  }
+  .marquee-content { display: flex; white-space: nowrap; animation: marquee 25s linear infinite; }
+  .marquee-item {
+    font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 500;
+    color: rgba(255,255,255,0.3); margin-right: 60px;
+    display: flex; align-items: center; text-transform: uppercase;
+    transition: color 0.3s;
+  }
+  .marquee-item:hover { color: var(--accent); }
+  .marquee-item::after { content: '/'; color: var(--accent); margin-left: 60px; font-size: 18px; }
+  @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+  .section-pad { padding: 120px 5%; }
+  .container { width: 100%; max-width: var(--container); margin: 0 auto; }
+  .section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(32px, 4vw, 56px); font-weight: 600;
+    line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 30px;
+  }
+
+  .solutions { border-bottom: 1px solid var(--border); }
+  .solutions-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 16px; margin-top: 60px; perspective: 1000px;
+  }
+  
+  .card {
+    background: var(--card-bg); border: 1px solid var(--border);
+    padding: 32px; border-radius: 16px;
+    transition: transform 0.1s ease-out, border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
+    display: flex; flex-direction: column;
+    position: relative; overflow: hidden;
+    transform-style: preserve-3d; will-change: transform;
+  }
+  .card::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(400px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(0, 255, 102, 0.1), transparent 40%);
+    opacity: 0; transition: opacity 0.3s;
+    pointer-events: none; z-index: 1;
+  }
+  .card:hover::before { opacity: 1; }
+  .card:hover { border-color: rgba(0, 255, 102, 0.4); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+  .card-content { position: relative; z-index: 2; transform: translateZ(20px); }
+  .card-num { font-family: 'Space Grotesk', sans-serif; font-size: 14px; color: var(--accent); margin-bottom: 20px; }
+  .card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 500; margin-bottom: 12px; }
+  .card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+  .numbers-section {
+    position: relative; height: 100vh; min-height: 700px;
+    border-bottom: 1px solid var(--border); overflow: hidden;
+  }
+  .number-center { position: absolute; inset: 0; z-index: 2; }
+  .number-wrapper {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .number-center .huge {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(200px, 32vw, 520px); font-weight: 600;
+    line-height: 1; color: var(--accent); letter-spacing: -0.06em;
+    text-shadow: 0 0 120px rgba(0, 255, 102, 0.4);
+    visibility: hidden; user-select: none; white-space: nowrap;
+  }
+  #sandCanvas {
+    position: absolute; inset: 0; z-index: 2;
+    pointer-events: auto; width: 100%; height: 100%;
+  }
+  .number-center .label {
+    position: absolute; bottom: 10%; left: 0; right: 0; text-align: center;
+    font-size: 14px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--muted); z-index: 3; pointer-events: none;
+  }
+  .corner-stat {
+    position: absolute; display: flex; flex-direction: column;
+    z-index: 5; pointer-events: none;
+  }
+  .corner-stat .num { font-family: 'Space Grotesk', sans-serif; font-size: 48px; font-weight: 500; color: var(--text); }
+  .corner-stat .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); margin-top: 8px; }
+  .stat-tl { top: 12%; left: 5%; }
+  .stat-tr { top: 12%; right: 5%; text-align: right; }
+  .stat-bl { bottom: 12%; left: 5%; }
+  .stat-br { bottom: 12%; right: 5%; text-align: right; }
+
+  .pricing { border-bottom: 1px solid var(--border); }
+  .pricing-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 16px; margin-top: 60px; perspective: 1000px;
+  }
+  .price-card {
+    background: var(--card-bg); border: 1px solid var(--border);
+    padding: 40px; border-radius: 16px;
+    display: flex; flex-direction: column;
+    transition: transform 0.1s ease-out, border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
+    position: relative; overflow: hidden; transform-style: preserve-3d;
+  }
+  .price-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(400px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(0, 255, 102, 0.1), transparent 40%);
+    opacity: 0; transition: opacity 0.3s;
+    pointer-events: none; z-index: 1;
+  }
+  .price-card:hover::before { opacity: 1; }
+  .price-card:hover { border-color: var(--accent); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+  .price-content {
+    position: relative; z-index: 2; transform: translateZ(30px);
+    display: flex; flex-direction: column; height: 100%;
+  }
+  .price-card.premium {
+    background: linear-gradient(180deg, rgba(0, 255, 102, 0.08) 0%, #0a0a0a 100%);
+    border-color: var(--accent);
+  }
+  .price-title { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 500; margin-bottom: 16px; color: var(--muted); }
+  .price-val {
+    font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 600;
+    margin-bottom: 32px; color: var(--text);
+    animation: subtlePulse 3s infinite alternate;
+  }
+  @keyframes subtlePulse { 0% { transform: scale(1); } 100% { transform: scale(1.02); } }
+  .price-val span { font-size: 14px; color: var(--muted); font-weight: 400; }
+  .price-list { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; flex: 1; }
+  .price-list li { font-size: 13px; color: var(--muted); display: flex; gap: 10px; align-items: flex-start; }
+  .price-list li::before { content: '/'; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+  .btn-price {
+    display: block; width: 100%; padding: 14px; text-align: center;
+    border: 1px solid var(--border); border-radius: 100px;
+    font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 500;
+    transition: all 0.3s var(--ease);
+  }
+  .price-card:hover .btn-price { background: var(--accent); color: #000; border-color: var(--accent); }
+
+  .locations-section { padding: 120px 5%; border-bottom: 1px solid var(--border); }
+  .locations-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 60px; }
+
+  /* --- Location cards с анимациями --- */
+  .location-card {
+    background: var(--card-bg); border: 1px solid var(--border);
+    padding: 60px; border-radius: 24px;
+    position: relative; overflow: hidden;
+    transition: border-color 0.4s var(--ease),
+                transform 0.4s var(--ease),
+                box-shadow 0.4s var(--ease);
+    transform-style: preserve-3d;
+  }
+  .location-card > * { position: relative; z-index: 1; }
+
+  /* Глоу за курсором (hover) */
+  .location-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(500px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                rgba(0, 255, 102, 0.12), transparent 40%);
+    opacity: 0; transition: opacity 0.4s var(--ease);
+    pointer-events: none; z-index: 0;
+  }
+  .location-card:hover::before { opacity: 1; }
+
+  /* Постоянное плавающее свечение */
+  .location-card::after {
+    content: ''; position: absolute;
+    top: -30%; right: -20%; width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0, 255, 102, 0.09) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
+    animation: floatGlow 9s ease-in-out infinite;
+  }
+  @keyframes floatGlow {
+    0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+    50%      { transform: translate(-40px, 40px) scale(1.3); opacity: 1; }
+  }
+
+  .location-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-6px);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 60px rgba(0,255,102,0.1);
+  }
+
+  .location-city {
+    font-family: 'Space Grotesk', sans-serif; font-size: 48px; font-weight: 600;
+    margin-bottom: 24px; color: var(--accent); line-height: 1;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .location-city::before {
+    content: ''; width: 14px; height: 14px; border-radius: 50%;
+    background: var(--accent); flex-shrink: 0;
+    box-shadow: 0 0 16px var(--accent);
+    animation: locationPulse 2s ease-out infinite;
+  }
+  @keyframes locationPulse {
+    0%   { box-shadow: 0 0 0 0 rgba(0,255,102,0.6), 0 0 16px var(--accent); }
+    100% { box-shadow: 0 0 0 20px rgba(0,255,102,0), 0 0 16px var(--accent); }
+  }
+
+  .location-address { font-size: 18px; color: var(--text); margin-bottom: 12px; }
+  .location-meta { font-size: 14px; color: var(--muted); display: flex; gap: 16px; margin-top: 32px; }
+  .location-meta span { display: flex; align-items: center; gap: 6px; }
+  .location-meta span::before { content: '/'; color: var(--accent); }
+
+  .contacts-section { padding: 160px 5%; display: flex; justify-content: center; }
+  .form-wrapper {
+    max-width: 800px; width: 100%; background: var(--card-bg);
+    padding: 60px; border-radius: 24px; border: 1px solid var(--border);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+  }
+  .form-wrapper h2 { font-family: 'Space Grotesk', sans-serif; font-size: 40px; font-weight: 600; text-align: center; margin-bottom: 16px; }
+  .form-wrapper p { color: var(--muted); text-align: center; margin-bottom: 48px; }
+
+  form { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .input-group { display: flex; flex-direction: column; gap: 8px; }
+  .input-group.full { grid-column: 1 / -1; }
+  .input-group label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-weight: 500; }
+  
+  /* ИСПРАВЛЕННЫЙ БЛОК: разделили свойства и добавили appearance */
+  .input-group input, .input-group select, .input-group textarea {
+    width: 100%; background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px; font-size: 16px; color: var(--text);
+    outline: none; transition: border-color 0.3s var(--ease);
+    font-family: inherit;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+  
+  .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
+    border-color: var(--accent); background: rgba(0,255,102,0.02);
+  }
+  .input-group textarea { min-height: 120px; resize: vertical; }
+  .input-group select { cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 16px center; background-size: 16px; }
+  .input-group select option { background: #111; color: #fff; }
+  form .btn-primary { grid-column: 1 / -1; width: 100%; margin-top: 16px; }
+
+  footer { border-top: 1px solid var(--border); padding: 80px 5% 40px; background: #050505; }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; max-width: var(--container); margin: 0 auto 60px; }
+  .footer-logo { font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 700; margin-bottom: 16px; }
+  .footer-logo span { color: var(--accent); }
+  .footer-desc { color: var(--muted); font-size: 14px; line-height: 1.6; max-width: 300px; }
+  .footer-col h4 { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 24px; color: #fff; }
+  .footer-col a { display: block; color: var(--muted); font-size: 14px; margin-bottom: 12px; transition: color 0.3s var(--ease); }
+  .footer-col a:hover { color: var(--accent); }
+  .footer-bottom {
+    max-width: var(--container); margin: 0 auto;
+    padding-top: 24px; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--muted); font-size: 13px;
+  }
+
+  .cart-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px); z-index: 2000;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s var(--ease);
+  }
+  .cart-overlay.active { opacity: 1; pointer-events: auto; }
+
+  .cart-sidebar {
+    position: fixed; top: 0; right: 0;
+    width: 100%; max-width: 450px; height: 100vh;
+    background: var(--bg); z-index: 2001;
+    transform: translateX(100%);
+    transition: transform 0.4s var(--ease);
+    display: flex; flex-direction: column;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+    border-left: 1px solid var(--border);
+  }
+  .cart-sidebar.open { transform: translateX(0); }
+  .cart-header { padding: 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+  .cart-header h3 { font-family: 'Space Grotesk', sans-serif; font-size: 20px; }
+  .close-cart { font-size: 22px; color: var(--muted); transition: color 0.3s; }
+  .close-cart:hover { color: var(--text); }
+  .cart-items { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 20px; }
+  .cart-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+  .cart-item-title { font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 500; }
+  .cart-item-price { font-family: 'Space Grotesk', sans-serif; font-size: 16px; color: var(--accent); margin-top: 4px; }
+  .remove-item { color: var(--muted); font-size: 20px; transition: color 0.3s; }
+  .remove-item:hover { color: #ff1e1e; }
+  .cart-footer { padding: 30px; border-top: 1px solid var(--border); background: var(--card-bg); }
+  .cart-total { display: flex; justify-content: space-between; font-family: 'Space Grotesk', sans-serif; font-size: 18px; margin-bottom: 24px; font-weight: 600; }
+  .checkout-btn { width: 100%; padding: 18px; background: var(--accent); color: #000; border-radius: 100px; font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600; text-align: center; transition: all 0.3s; }
+  .checkout-btn:hover { background: #00cc52; transform: translateY(-2px); }
+  .empty-cart-msg { text-align: center; color: var(--muted); margin-top: 40px; }
+
+  .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 1280px) {
+    .hero-chat { display: none; }
+    .hero-right { padding-left: 10%; }
+  }
+  @media (max-width: 1200px) {
+    .solutions-grid { grid-template-columns: repeat(3, 1fr); }
+    .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 1024px) {
+    .hero { grid-template-columns: 1fr; padding-top: 120px; padding-bottom: 80px; gap: 60px; }
+    .hero-content { max-width: 100%; padding-right: 0; }
+    .hero-right { flex-direction: column; padding-left: 0; align-items: stretch; }
+    .hero-numbers { padding-left: 0; flex-direction: row; flex-wrap: wrap; gap: 40px; }
+    .hero-number-block { flex: 1; min-width: 200px; }
+    .corner-stat { position: static; text-align: center !important; margin: 20px 0; z-index: 5; }
+    .numbers-section { height: 80vh; min-height: 600px; padding: 40px 5%; display: flex; flex-direction: column; justify-content: center; gap: 30px; }
+    .number-center { position: relative; height: 400px; }
+    .number-center .huge { font-size: 140px; }
+    form { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .locations-grid { grid-template-columns: 1fr; }
+    .location-card { padding: 40px; }
+    .location-city { font-size: 36px; }
+  }
+  @media (max-width: 768px) {
+    nav { display: none; }
+    .solutions-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: clamp(40px, 10vw, 64px); }
+    .hero-number { font-size: 80px; }
+    .form-wrapper { padding: 40px 24px; }
+    .footer-grid { grid-template-columns: 1fr; }
+    .footer-bottom { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .number-center { height: 300px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="cursor"></div>
+
+<header id="header">
+  <a href="#" class="logo">AI-SYSTEMS<span>.</span></a>
+  <nav>
+    <a href="#solutions">Решения</a>
+    <a href="#numbers">Цифры</a>
+    <a href="#pricing">Тарифы</a>
+    <a href="#locations">Офисы</a>
+    <a href="#contacts">Контакты</a>
+  </nav>
+  <div class="header-right">
+    <button class="cart-btn" id="open-cart-btn">
+      Корзина <span class="cart-count" id="cart-count">0</span>
+    </button>
+    <a href="#contacts" class="btn-header magnetic">Обсудить проект</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="hero-content">
+      <h1>
+        <span>БОТЫ, КОТОРЫЕ ПРОДАЮТ</span>
+        <span>ВМЕСТО ЛЮДЕЙ</span>
+      </h1>
+      <p class="reveal">Внедряем AI-ассистентов в Telegram и WhatsApp. Отвечают 24/7, не берут больничный и не теряют заявки.</p>
+      <a href="#contacts" class="btn-primary reveal magnetic" style="transition-delay: 0.2s;">Обсудить проект</a>
+    </div>
+    
+    <div class="hero-right">
+      <div class="hero-numbers reveal" style="transition-delay: 0.3s;">
+        <div class="hero-number-block">
+          <div class="hero-number" data-target="24/7">0</div>
+          <div class="hero-label">Режим работы</div>
+        </div>
+        <div class="hero-number-block">
+          <div class="hero-number" data-target="-70%">0</div>
+          <div class="hero-label">Нагрузка на поддержку</div>
+        </div>
+        <div class="hero-number-block">
+          <div class="hero-number" data-target="x3">0</div>
+          <div class="hero-label">Рост конверсии</div>
+        </div>
+      </div>
+
+      <div class="hero-chat reveal" style="transition-delay: 0.5s;">
+        <div class="chat-header">
+          <div class="chat-avatar">AI</div>
+          <div class="chat-meta">
+            <div class="chat-name">AI-SYSTEMS Bot</div>
+            <div class="chat-status">онлайн · &lt; 1 сек</div>
+          </div>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-footer">
+          <div class="chat-input-fake">Написать сообщение...</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="marquee-section">
+    <div class="marquee-content">
+      <div class="marquee-item">ChatGPT</div>
+      <div class="marquee-item">Claude</div>
+      <div class="marquee-item">Telegram API</div>
+      <div class="marquee-item">WhatsApp Business</div>
+      <div class="marquee-item">amoCRM</div>
+      <div class="marquee-item">Bitrix24</div>
+      <div class="marquee-item">ChatGPT</div>
+      <div class="marquee-item">Claude</div>
+      <div class="marquee-item">Telegram API</div>
+      <div class="marquee-item">WhatsApp Business</div>
+      <div class="marquee-item">amoCRM</div>
+      <div class="marquee-item">Bitrix24</div>
+    </div>
+  </div>
+
+  <section class="section-pad solutions" id="solutions">
+    <div class="container">
+      <h2 class="section-title reveal">Что мы автоматизируем</h2>
+      <div class="solutions-grid">
+        <div class="card reveal">
+          <div class="card-content">
+            <div class="card-num">01</div>
+            <h3>Бот-консультант</h3>
+            <p>Отвечает на вопросы, подбирает товар и формирует заказ на основе базы знаний.</p>
+          </div>
+        </div>
+        <div class="card reveal" style="transition-delay: 0.05s;">
+          <div class="card-content">
+            <div class="card-num">02</div>
+            <h3>Бот-менеджер</h3>
+            <p>Квалифицирует лиды, собирает контакты и передаёт в отдел продаж тёплых клиентов.</p>
+          </div>
+        </div>
+        <div class="card reveal" style="transition-delay: 0.1s;">
+          <div class="card-content">
+            <div class="card-num">03</div>
+            <h3>Интеграция с CRM</h3>
+            <p>Подключаем к amoCRM или Bitrix24. Все данные и сделки обновляются автоматически.</p>
+          </div>
+        </div>
+        <div class="card reveal" style="transition-delay: 0.15s;">
+          <div class="card-content">
+            <div class="card-num">04</div>
+            <h3>Голосовой ассистент</h3>
+            <p>Принимает звонки, распознаёт речь и записывает клиента на встречу без человека.</p>
+          </div>
+        </div>
+        <div class="card reveal" style="transition-delay: 0.2s;">
+          <div class="card-content">
+            <div class="card-num">05</div>
+            <h3>HR-бот</h3>
+            <p>Проводит первичное интервью, отвечает на вопросы и помогает с онбордингом.</p>
+          </div>
+        </div>
+        <div class="card reveal" style="transition-delay: 0.25s;">
+          <div class="card-content">
+            <div class="card-num">06</div>
+            <h3>AI-копирайтер</h3>
+            <p>Генерирует контент для соцсетей и email-рассылок на основе вашего Tone of Voice.</p>
+          </div>
+        </div>
+        <div class="card reveal" style="transition-delay: 0.3s;">
+          <div class="card-content">
+            <div class="card-num">07</div>
+            <h3>Бот-аналитик</h3>
+            <p>Собирает метрики, строит отчёты и присылает уведомления об аномалиях в продажах.</p>
+          </div>
+        </div>
+        <div class="card reveal" style="transition-delay: 0.35s;">
+          <div class="card-content">
+            <div class="card-num">08</div>
+            <h3>Внутренний портал</h3>
+            <p>База знаний для сотрудников. Отвечает на вопросы по регламентам и процессам.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="numbers-section" id="numbers">
+    <div class="corner-stat stat-tl reveal">
+      <div class="num" data-target="99.9%">0%</div>
+      <div class="lbl">Uptime</div>
+    </div>
+    <div class="corner-stat stat-tr reveal" style="transition-delay: 0.1s;">
+      <div class="num" data-target="< 1 сек">&lt; 1 сек</div>
+      <div class="lbl">Время ответа</div>
+    </div>
+    <div class="corner-stat stat-bl reveal" style="transition-delay: 0.2s;">
+      <div class="num" data-target="12">0</div>
+      <div class="lbl">Интеграций</div>
+    </div>
+    <div class="corner-stat stat-br reveal" style="transition-delay: 0.3s;">
+      <div class="num" data-target="5 лет">0</div>
+      <div class="lbl">Опыта в разработке</div>
+    </div>
+
+    <div class="number-center reveal" id="sandBlock">
+      <div class="number-wrapper" id="numberWrapper">
+        <div class="huge" data-target="500+" id="hugeText">500+</div>
+      </div>
+      <div class="label">Запущенных ботов</div>
+    </div>
+  </section>
+
+  <section class="section-pad pricing" id="pricing">
+    <div class="container">
+      <h2 class="section-title reveal">Тарифы</h2>
+      <div class="pricing-grid">
+        <div class="price-card reveal">
+          <div class="price-content">
+            <div class="price-title">Аудит</div>
+            <div class="price-val">10 000 <span>₽</span></div>
+            <ul class="price-list">
+              <li>Анализ бизнес-процессов</li>
+              <li>Карта точек автоматизации</li>
+              <li>Рекомендации по внедрению</li>
+            </ul>
+            <button class="btn-price add-to-cart" data-name="Тариф Аудит" data-price="10000">Выбрать</button>
+          </div>
+        </div>
+
+        <div class="price-card reveal" style="transition-delay: 0.05s;">
+          <div class="price-content">
+            <div class="price-title">Старт</div>
+            <div class="price-val">30 000 <span>₽</span></div>
+            <ul class="price-list">
+              <li>Бот на базе Telegram</li>
+              <li>До 10 сценариев диалога</li>
+              <li>Подключение базы знаний</li>
+            </ul>
+            <button class="btn-price add-to-cart" data-name="Тариф Старт" data-price="30000">Выбрать</button>
+          </div>
+        </div>
+
+        <div class="price-card reveal" style="transition-delay: 0.1s;">
+          <div class="price-content">
+            <div class="price-title">Рост</div>
+            <div class="price-val">50 000 <span>₽</span></div>
+            <ul class="price-list">
+              <li>Всё из тарифа «Старт»</li>
+              <li>До 30 сценариев</li>
+              <li>Интеграция с Google Таблицами</li>
+            </ul>
+            <button class="btn-price add-to-cart" data-name="Тариф Рост" data-price="50000">Выбрать</button>
+          </div>
+        </div>
+        
+        <div class="price-card premium reveal" style="transition-delay: 0.15s;">
+          <div class="price-content">
+            <div class="price-title">Бизнес</div>
+            <div class="price-val">70 000 <span>₽</span></div>
+            <ul class="price-list">
+              <li>Всё из тарифа «Рост»</li>
+              <li>Интеграция с CRM</li>
+              <li>Голосовой ассистент</li>
+              <li>Обучение нейросети (GPT/Claude)</li>
+            </ul>
+            <button class="btn-price add-to-cart" data-name="Тариф Бизнес" data-price="70000">Выбрать</button>
+          </div>
+        </div>
+
+        <div class="price-card reveal" style="transition-delay: 0.2s;">
+          <div class="price-content">
+            <div class="price-title">Корпорация</div>
+            <div class="price-val">150 000 <span>₽</span></div>
+            <ul class="price-list">
+              <li>Всё из тарифа «Бизнес»</li>
+              <li>Сложные API-интеграции</li>
+              <li>Мультиканальность (TG, WA, VK)</li>
+              <li>Выделенная команда</li>
+            </ul>
+            <button class="btn-price add-to-cart" data-name="Тариф Корпорация" data-price="150000">Выбрать</button>
+          </div>
+        </div>
+        
+        <div class="price-card reveal" style="transition-delay: 0.25s;">
+          <div class="price-content">
+            <div class="price-title">Enterprise</div>
+            <div class="price-val">По запросу</div>
+            <ul class="price-list">
+              <li>Разработка под ключ</li>
+              <li>Индивидуальная архитектура</li>
+              <li>Персональный менеджер</li>
+              <li>SLA и поддержка 24/7</li>
+            </ul>
+            <a href="#contacts" class="btn-price magnetic">Обсудить</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="locations-section" id="locations">
+    <div class="container">
+      <h2 class="section-title reveal">Наши офисы</h2>
+      <div class="locations-grid">
+        <div class="location-card reveal">
+          <div class="location-city">Москва</div>
+          <div class="location-address">ул. Тверская, 12</div>
+          <div class="location-meta">
+            <span>Пн-Пт / 10:00 - 19:00</span>
+            <span>+7 (495) 123-45-67</span>
+          </div>
+        </div>
+        <div class="location-card reveal" style="transition-delay: 0.1s;">
+          <div class="location-city">Санкт-Петербург</div>
+          <div class="location-address">Невский проспект, 45</div>
+          <div class="location-meta">
+            <span>Пн-Пт / 10:00 - 19:00</span>
+            <span>+7 (812) 123-45-67</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contacts-section" id="contacts">
+    <div class="form-wrapper reveal">
+      <h2>Оставьте заявку</h2>
+      <p>Заполните форму, и мы свяжемся с вами для обсуждения деталей проекта.</p>
+      
+      <form id="contactForm">
+        <div class="input-group">
+          <label for="name">Имя</label>
+          <input type="text" id="name" name="name" placeholder="Как к вам обращаться" required>
+        </div>
+        <div class="input-group">
+          <label for="phone">Телефон или Telegram</label>
+          <input type="text" id="phone" name="phone" placeholder="+7 (___) ___-__-__ или @username" required>
+        </div>
+        <div class="input-group">
+          <label for="company">Компания (необязательно)</label>
+          <input type="text" id="company" name="company" placeholder="Название вашей компании">
+        </div>
+        <div class="input-group">
+          <label for="budget">Бюджет</label>
+          <select id="budget" name="budget" required>
+            <option value="" disabled selected>Выберите бюджет</option>
+            <option value="30 000 - 50 000 ₽">30 000 - 50 000 ₽</option>
+            <option value="50 000 - 100 000 ₽">50 000 - 100 000 ₽</option>
+            <option value="100 000 - 200 000 ₽">100 000 - 200 000 ₽</option>
+            <option value="Более 200 000 ₽">Более 200 000 ₽</option>
+            <option value="Пока не знаю">Пока не знаю</option>
+          </select>
+        </div>
+        <div class="input-group full">
+          <label for="details">Описание проекта</label>
+          <textarea id="details" name="details" placeholder="Расскажите, что хотите автоматизировать"></textarea>
+        </div>
+        <button type="submit" class="btn-primary magnetic" id="submitBtn">Отправить</button>
+      </form>
+      
+      <div id="formSuccess" style="display: none; text-align: center; padding: 32px; border: 1px solid var(--accent); border-radius: 16px; margin-top: 24px; color: var(--accent); background: rgba(0,255,102,0.05);">
+        <div style="font-size: 48px; margin-bottom: 16px;">✓</div>
+        <p style="font-size: 18px; font-weight: 500;">Спасибо! Мы свяжемся с вами в ближайшее время.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-col">
+      <div class="footer-logo">AI-SYSTEMS<span>.</span></div>
+      <p class="footer-desc">Внедряем нейросети и AI-ассистентов в бизнес-процессы. Продажи, поддержка, HR.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Навигация</h4>
+      <a href="#solutions">Решения</a>
+      <a href="#numbers">Цифры</a>
+      <a href="#pricing">Тарифы</a>
+      <a href="#locations">Офисы</a>
+    </div>
+    <div class="footer-col">
+      <h4>Контакты</h4>
+      <a href="tel:+79991234567">+7 (999) 123-45-67</a>
+      <a href="mailto:hello@ai-systems.ru">hello@ai-systems.ru</a>
+      <a href="https://t.me/ai_systems" target="_blank">Telegram</a>
+    </div>
+    <div class="footer-col">
+      <h4>Документы</h4>
+      <a href="#">Политика конфиденциальности</a>
+      <a href="#">Публичная оферта</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>© 2026 AI-SYSTEMS / Разработка AI-ботов</div>
+    <div>Сделано с умом</div>
+  </div>
+</footer>
+
+<div class="cart-overlay" id="cart-overlay"></div>
+<aside class="cart-sidebar" id="cart-sidebar">
+  <div class="cart-header">
+    <h3>Выбранные тарифы</h3>
+    <button class="close-cart" id="close-cart-btn">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items">
+    <div class="empty-cart-msg" id="empty-cart-msg">Пока ничего не выбрано</div>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-total">
+      <span>Итого:</span>
+      <span id="cart-total-price">0 ₽</span>
+    </div>
+    <button class="checkout-btn" id="checkout-btn">Оформить заявку</button>
+  </div>
+</aside>
+
+<script>
+  window.addEventListener('scroll', () => {
+    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const progress = (scrollTop / scrollHeight) * 100;
+    document.getElementById('progressBar').style.width = progress + '%';
+  }, { passive: true });
+
+  (function () {
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+    const cursor = document.querySelector('.cursor');
+    let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+    let cx = mx, cy = my;
+
+    document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
+
+    function loop() {
+      cx += (mx - cx) * 0.12;
+      cy += (my - cy) * 0.12;
+      cursor.style.transform = `translate(${cx}px, ${cy}px) translate(-50%, -50%)`;
+      requestAnimationFrame(loop);
+    }
+    loop();
+
+    const hoverables = 'a, button, .card, .input-group input, .price-card, .location-card, #sandCanvas';
+    document.querySelectorAll(hoverables).forEach((el) => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+    });
+  })();
+
+  window.addEventListener('scroll', () => {
+    const header = document.getElementById('header');
+    if (window.scrollY > 50) header.classList.add('scrolled');
+    else header.classList.remove('scrolled');
+  }, { passive: true });
+
+  function initCardInteractions() {
+    if (window.innerWidth <= 768) return;
+    const cards = document.querySelectorAll('.card, .price-card');
+    cards.forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -8; 
+        const rotateY = ((x - centerX) / centerX) * 8;
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`;
+      });
+    });
+  }
+  document.addEventListener('DOMContentLoaded', initCardInteractions);
+
+  function initMagneticButtons() {
+    if (window.innerWidth <= 768) return;
+    const buttons = document.querySelectorAll('.magnetic');
+    buttons.forEach(btn => {
+      btn.addEventListener('mousemove', (e) => {
+        const rect = btn.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+      });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.transform = `translate(0px, 0px)`;
+      });
+    });
+  }
+  document.addEventListener('DOMContentLoaded', initMagneticButtons);
+
+  function initRevealAnimations() {
+    const els = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    els.forEach((el) => io.observe(el));
+  }
+  document.addEventListener('DOMContentLoaded', initRevealAnimations);
+
+  function initCountUp() {
+    const els = document.querySelectorAll('[data-target]');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const targetStr = el.getAttribute('data-target');
+          if (targetStr.includes('/') || targetStr.includes('<') || targetStr.includes('x') || targetStr.includes('лет') || targetStr.includes('+')) {
+            el.textContent = targetStr;
+          } else {
+            const target = parseFloat(targetStr);
+            const duration = 1500;
+            const start = performance.now();
+            function update(now) {
+              const progress = Math.min((now - start) / duration, 1);
+              const current = 0 + (target - 0) * progress;
+              el.textContent = Math.floor(current) + (targetStr.includes('%') ? '%' : '');
+              if (progress < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+          }
+          io.unobserve(el);
+        }
+      });
+    }, { threshold: 0.5 });
+    els.forEach(el => io.observe(el));
+  }
+  document.addEventListener('DOMContentLoaded', initCountUp);
+
+  function initSandAnimation() {
+    const wrapper = document.getElementById('numberWrapper');
+    const hugeEl = document.getElementById('hugeText');
+    if (!wrapper || !hugeEl) return;
+
+    const text = hugeEl.getAttribute('data-target') || hugeEl.textContent;
+    const dpr = Math.min(window.devicePixelRatio, 2);
+    const width = wrapper.offsetWidth;
+    const height = wrapper.offsetHeight;
+
+    const canvas = document.createElement('canvas');
+    canvas.id = 'sandCanvas';
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+    wrapper.appendChild(canvas);
+
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    const fontSize = parseFloat(getComputedStyle(hugeEl).fontSize);
+    ctx.font = `600 ${fontSize}px "Space Grotesk", sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#00ff66';
+    ctx.fillText(text, width / 2, height / 2);
+
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+
+    const particles = [];
+    const step = 3;
+
+    for (let y = 0; y < canvas.height; y += step) {
+      for (let x = 0; x < canvas.width; x += step) {
+        const index = (y * canvas.width + x) * 4;
+        if (data[index + 3] > 128) {
+          const px = x / dpr, py = y / dpr;
+          particles.push({
+            x: px, y: py,
+            originX: px, originY: py,
+            vx: 0, vy: 0,
+            size: Math.random() * 2.2 + 1.2,
+          });
+        }
+      }
+    }
+
+    ctx.clearRect(0, 0, width, height);
+
+    let mouseX = -9999, mouseY = -9999;
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouseX = e.clientX - rect.left;
+      mouseY = e.clientY - rect.top;
+    });
+    canvas.addEventListener('mouseleave', () => {
+      mouseX = -9999; mouseY = -9999;
+    });
+    canvas.addEventListener('touchmove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const touch = e.touches[0];
+      mouseX = touch.clientX - rect.left;
+      mouseY = touch.clientY - rect.top;
+    }, { passive: true });
+    canvas.addEventListener('touchend', () => {
+      mouseX = -9999; mouseY = -9999;
+    });
+
+    const REPEL_RADIUS = 240;
+    const REPEL_FORCE  = 2.2;
+    const SPRING       = 0.025;
+    const FRICTION     = 0.88;
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.vx += (p.originX - p.x) * SPRING;
+        p.vy += (p.originY - p.y) * SPRING;
+
+        if (mouseX !== -9999) {
+          const dx = p.x - mouseX;
+          const dy = p.y - mouseY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < REPEL_RADIUS && dist > 0.1) {
+            const force = (1 - dist / REPEL_RADIUS) * REPEL_FORCE;
+            p.vx += (dx / dist) * force;
+            p.vy += (dy / dist) * force;
+          }
+        }
+
+        p.vx *= FRICTION;
+        p.vy *= FRICTION;
+        p.x += p.vx;
+        p.y += p.vy;
+
+        ctx.fillStyle = '#00ff66';
+        ctx.fillRect(p.x, p.y, p.size, p.size);
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+  }
+  document.addEventListener('DOMContentLoaded', initSandAnimation);
+
+  /* --- Анимация чат-превью в hero --- */
+  function initChatAnimation() {
+    const messagesEl = document.getElementById('chatMessages');
+    if (!messagesEl) return;
+
+    const conversation = [
+      { role: 'user', text: 'Привет! Ищу бота для магазина' },
+      { role: 'bot',  text: 'Здравствуйте! Помогу подобрать. Какой у вас бизнес?' },
+      { role: 'user', text: 'Интернет-магазин одежды' },
+      { role: 'bot',  text: 'Отлично! Тариф «Старт»: бот + 10 сценариев + база знаний. 30 000 ₽, запуск за 3 дня.' },
+      { role: 'user', text: 'Отлично, оформляйте!' },
+      { role: 'bot',  text: 'Заявка принята ✅ Менеджер свяжется в течение 5 минут.' }
+    ];
+
+    const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+    async function run() {
+      await sleep(1500);
+      while (true) {
+        messagesEl.innerHTML = '';
+        for (const msg of conversation) {
+          if (msg.role === 'bot') {
+            const typing = document.createElement('div');
+            typing.className = 'typing-bubble';
+            typing.innerHTML = '<span></span><span></span><span></span>';
+            messagesEl.appendChild(typing);
+            await sleep(1400);
+            typing.remove();
+          } else {
+            await sleep(700);
+          }
+          const el = document.createElement('div');
+          el.className = `chat-msg ${msg.role}`;
+          el.textContent = msg.text;
+          messagesEl.appendChild(el);
+          await sleep(500);
+        }
+        await sleep(3500);
+        Array.from(messagesEl.children).forEach(c => {
+          c.style.transition = 'opacity 0.35s';
+          c.style.opacity = '0';
+        });
+        await sleep(400);
+      }
+    }
+    run();
+  }
+  document.addEventListener('DOMContentLoaded', initChatAnimation);
+
+  /* --- Hover-глоу для карточек офисов --- */
+  function initLocationCards() {
+    if (window.innerWidth <= 768) return;
+    document.querySelectorAll('.location-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--mouse-x', (e.clientX - rect.left) + 'px');
+        card.style.setProperty('--mouse-y', (e.clientY - rect.top) + 'px');
+      });
+    });
+  }
+  document.addEventListener('DOMContentLoaded', initLocationCards);
+
+  let cart = [];
+  const cartCountEl = document.getElementById('cart-count');
+  const cartItemsEl = document.getElementById('cart-items');
+  const cartTotalEl = document.getElementById('cart-total-price');
+
+  document.querySelectorAll('.add-to-cart').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const name = btn.getAttribute('data-name');
+      const price = parseInt(btn.getAttribute('data-price'));
+      if (!cart.find(item => item.name === name)) {
+        cart.push({ name, price });
+        updateCartUI();
+        document.getElementById('cart-sidebar').classList.add('open');
+        document.getElementById('cart-overlay').classList.add('active');
+      } else {
+        alert('Этот тариф уже добавлен в корзину.');
+      }
+    });
+  });
+
+  document.getElementById('open-cart-btn').addEventListener('click', () => {
+    document.getElementById('cart-sidebar').classList.add('open');
+    document.getElementById('cart-overlay').classList.add('active');
+  });
+  
+  function closeCart() {
+    document.getElementById('cart-sidebar').classList.remove('open');
+    document.getElementById('cart-overlay').classList.remove('active');
+  }
+  
+  document.getElementById('close-cart-btn').addEventListener('click', closeCart);
+  document.getElementById('cart-overlay').addEventListener('click', closeCart);
+
+  function updateCartUI() {
+    cartCountEl.textContent = cart.length;
+    cartItemsEl.innerHTML = '';
+    if (cart.length === 0) {
+      cartItemsEl.innerHTML = '<div class="empty-cart-msg">Пока ничего не выбрано</div>';
+      cartTotalEl.textContent = '0 ₽';
+      return;
+    }
+    let total = 0;
+    cart.forEach((item, index) => {
+      total += item.price;
+      const itemEl = document.createElement('div');
+      itemEl.classList.add('cart-item');
+      itemEl.innerHTML = `
+        <div>
+          <div class="cart-item-title">${item.name}</div>
+          <div class="cart-item-price">${item.price.toLocaleString('ru-RU')} ₽</div>
+        </div>
+        <button class="remove-item" onclick="removeFromCart(${index})">✕</button>
+      `;
+      cartItemsEl.appendChild(itemEl);
+    });
+    cartTotalEl.textContent = total.toLocaleString('ru-RU') + ' ₽';
+  }
+
+  window.removeFromCart = function(index) {
+    cart.splice(index, 1);
+    updateCartUI();
+  };
+
+  document.getElementById('checkout-btn').addEventListener('click', () => {
+    if(cart.length === 0) return;
+    closeCart();
+    const details = document.getElementById('details');
+    let itemsText = 'Интересуют тарифы:\n';
+    cart.forEach(item => itemsText += `- ${item.name} (${item.price.toLocaleString()} ₽)\n`);
+    details.value = itemsText + '\n';
+    document.getElementById('contacts').scrollIntoView({ behavior: 'smooth' });
+  });
+
+  const WEB3FORMS_ACCESS_KEY = 'e1707b8e-060c-4394-ab27-90778190d0c3';
+  
+  document.getElementById('contactForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const submitBtn = document.getElementById('submitBtn');
+    const success = document.getElementById('formSuccess');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Отправляем...';
+    submitBtn.disabled = true;
+    const formData = new FormData(form);
+    formData.append('access_key', WEB3FORMS_ACCESS_KEY);
+    formData.append('subject', 'Новая заявка с сайта AI-SYSTEMS');
+    formData.append('_captcha', 'false');
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.success) {
+        form.style.display = 'none';
+        success.style.display = 'block';
+      } else {
+        alert('Ошибка при отправке. Попробуйте позже.');
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
+    } catch (err) {
+      alert('Ошибка соединения. Проверьте интернет.');
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
